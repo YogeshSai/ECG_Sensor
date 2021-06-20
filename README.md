@@ -2,8 +2,8 @@
 
 Connections
 
-gnd to gnd
-3.3 to 3.3
-out to vp
-lo- to rx
-lo+ to d2
+gnd to gnd......
+3.3 to 3.3......
+out to vp......
+lo- to rx......
+lo+ to tx/d2(Look in the code)
