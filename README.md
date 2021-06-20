@@ -1,9 +1,10 @@
 # ECG_Sensor
 
-Connections
-
-gnd to gnd......
-3.3 to 3.3......
-out to vp......
-lo- to rx......
-lo+ to tx/d2(Look in the code)
+Connections                                                                                                                                                                                                                 
+                                                                                                                                                                                                                 
+GND to GND                                                                                                                                                                                                                  
+3.3V to 3.3V                                                                                                                                                                                               
+OUTPUT to VP                                                                                                                                                                                             
+LO- to RX                                                                                                                                                                                               
+LO+ to TX/D2                                                                                                                                                                                                
+(Look in the code)
