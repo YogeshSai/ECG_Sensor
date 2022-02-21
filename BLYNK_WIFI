@@ -1,0 +1,86 @@
+#define BLYNK_PRINT Serial
+
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <BlynkSimpleEsp32.h>
+
+#include <Wire.h>
+#include "MAX30100_PulseOximeter.h"
+#include <Blynk.h>
+
+#define REPORTING_PERIOD_MS 1000
+
+float temp;
+int tempPin = 1;
+ 
+char auth[] = "KuuD9oEVKex67Uxg_yJD3rRjYjyOpItW";
+char ssid[] = "Malware repository";
+char pass[] = "Yogesh@2002";
+
+PulseOximeter pox;
+ 
+float BPM, SpO2;
+uint32_t tsLastReport = 0;
+ 
+ 
+void onBeatDetected()
+{
+    Serial.println("Beat Detected!");
+}
+ 
+
+BlynkTimer timer;
+
+void myTimerEvent()
+{
+  Blynk.virtualWrite(V5, analogRead(A0)); //ECG
+  Blynk.virtualWrite(V2, temp); //Temperature
+  Blynk.virtualWrite(V3, BPM);
+  Blynk.virtualWrite(V4, SpO2);
+}
+
+void setup()
+{
+  // Debug console
+  Serial.begin(9600);
+  Blynk.begin(auth, ssid, pass);
+  pinMode(41, INPUT); // Setup for leads off detection LO + txo
+  pinMode(40, INPUT); // Setup for leads off detection LO - rxo
+  pinMode(19, OUTPUT); //Oximeter
+  Serial.print("Initializing Pulse Oximeter..");
+  if (!pox.begin())
+    {
+         Serial.println("FAILED");
+         for(;;);
+    }
+  else
+    {
+         Serial.println("SUCCESS");
+         pox.setOnBeatDetectedCallback(onBeatDetected);
+    }
+  //pox.setIRLedCurrent(MAX30100_LED_CURR_7_6MA);
+  timer.setInterval(1000L, myTimerEvent);
+}
+
+void loop()
+{
+  pox.update();
+  Blynk.run();
+  timer.run();
+
+  temp = analogRead(tempPin);
+  temp = temp * 0.48828125;
+
+  BPM = pox.getHeartRate();
+  SpO2 = pox.getSpO2();
+    if (millis() - tsLastReport > REPORTING_PERIOD_MS)
+    {
+        Serial.print("Heart rate:");
+        Serial.print(BPM);
+        Serial.print(" bpm / SpO2:");
+        Serial.print(SpO2);
+        Serial.println(" %");
+ 
+        tsLastReport = millis();
+    }
+}
