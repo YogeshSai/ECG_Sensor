@@ -1,0 +1,47 @@
+C#define BLYNK_USE_DIRECT_CONNECT
+
+#define BLYNK_PRINT Serial
+
+#include <BlynkSimpleEsp32_BLE.h>
+#include <BLEDevice.h>
+#include <BLEServer.h>
+
+char auth[] = "5o8ZUxj50RABSFuU0gANyoBazqsOBYdC";
+
+BlynkTimer timer;
+
+void myTimerEvent()
+{
+  Blynk.virtualWrite(V5, analogRead(A0));
+}
+
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(41, INPUT); // Setup for leads off detection LO + txo
+  pinMode(40, INPUT); // Setup for leads off detection LO - rxo
+  pinMode(A0, OUTPUT);
+  timer.setInterval(200L, myTimerEvent);
+  Serial.begin(9600);
+
+  Serial.println("Waiting for connections...");
+
+  Blynk.setDeviceName("Blynk");
+
+  Blynk.begin(auth);
+}
+
+void loop()
+{
+  if((digitalRead(40) == 1)||(digitalRead(41) == 1)){
+  Serial.println('!');
+  }
+  else{
+  // send the value of analog input 0:
+  Serial.println(analogRead(A0));
+  }
+  //Wait for a bit to keep serial data from saturating
+  delay(1);
+  Blynk.run();
+  timer.run();
+}
